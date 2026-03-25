@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/evidence-reminders?secret=${CRON_SECRET}",
+      "schedule": "0 8 * * *"
+    }
+  ]
+}
