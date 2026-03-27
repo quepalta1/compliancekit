@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { Check, X } from "lucide-react";
 import type { Metadata } from "next";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export const metadata: Metadata = {
   title: "Pricing – ComplianceKit",
@@ -14,14 +23,15 @@ const plans = [
     price: "€0",
     period: "",
     description: "Get started with basic compliance tools.",
-    features: {
-      assessments: "1 assessment / month",
-      policies: "1 policy generation / month",
-      evidence: "25 evidence items",
-      members: "1 member",
-      pdf: false,
-    },
-    cta: "Get started free",
+    features: [
+      { text: "1 assessment / month", included: true },
+      { text: "1 policy generation / month", included: true },
+      { text: "25 evidence items", included: true },
+      { text: "1 team member", included: true },
+      { text: "PDF export", included: false },
+      { text: "Priority support", included: false },
+    ],
+    cta: "Get Started",
     highlighted: false,
   },
   {
@@ -29,14 +39,15 @@ const plans = [
     price: "€49",
     period: "/mo",
     description: "For small businesses getting compliant.",
-    features: {
-      assessments: "5 assessments / month",
-      policies: "10 policy generations / month",
-      evidence: "100 evidence items",
-      members: "1 member",
-      pdf: true,
-    },
-    cta: "Start with Starter",
+    features: [
+      { text: "5 assessments / month", included: true },
+      { text: "10 policy generations / month", included: true },
+      { text: "100 evidence items", included: true },
+      { text: "1 team member", included: true },
+      { text: "PDF export", included: true },
+      { text: "Priority support", included: false },
+    ],
+    cta: "Get Started",
     highlighted: false,
   },
   {
@@ -44,14 +55,15 @@ const plans = [
     price: "€149",
     period: "/mo",
     description: "For growing teams with serious compliance needs.",
-    features: {
-      assessments: "25 assessments / month",
-      policies: "50 policy generations / month",
-      evidence: "500 evidence items",
-      members: "5 members",
-      pdf: true,
-    },
-    cta: "Go Pro",
+    features: [
+      { text: "25 assessments / month", included: true },
+      { text: "50 policy generations / month", included: true },
+      { text: "500 evidence items", included: true },
+      { text: "5 team members", included: true },
+      { text: "PDF export", included: true },
+      { text: "Priority support", included: true },
+    ],
+    cta: "Get Started",
     highlighted: true,
   },
   {
@@ -59,151 +71,156 @@ const plans = [
     price: "€249",
     period: "/mo",
     description: "For larger organizations managing compliance at scale.",
-    features: {
-      assessments: "100 assessments / month",
-      policies: "200 policy generations / month",
-      evidence: "2,000 evidence items",
-      members: "15 members",
-      pdf: true,
-    },
-    cta: "Start with Team",
+    features: [
+      { text: "100 assessments / month", included: true },
+      { text: "200 policy generations / month", included: true },
+      { text: "2,000 evidence items", included: true },
+      { text: "15 team members", included: true },
+      { text: "PDF export", included: true },
+      { text: "Priority support", included: true },
+    ],
+    cta: "Get Started",
     highlighted: false,
   },
 ];
 
-const featureRows = [
-  { key: "assessments" as const, label: "Assessments" },
-  { key: "policies" as const, label: "Policy generations" },
-  { key: "evidence" as const, label: "Evidence items" },
-  { key: "members" as const, label: "Team members" },
-  { key: "pdf" as const, label: "PDF export" },
+const faqs = [
+  {
+    question: "Can I switch plans at any time?",
+    answer:
+      "Yes, you can upgrade or downgrade your plan at any time. When upgrading, you'll be prorated for the remainder of the billing cycle. When downgrading, the change takes effect at the end of your current billing period.",
+  },
+  {
+    question: "Is there a free trial for paid plans?",
+    answer:
+      "All paid plans come with a 14-day free trial. No credit card required to start. You'll only be charged when the trial ends and you decide to continue.",
+  },
+  {
+    question: "What happens to my data if I cancel?",
+    answer:
+      "Your data remains accessible for 30 days after cancellation. You can export all your assessments, policies, and evidence during this period. After 30 days, data is permanently deleted.",
+  },
+  {
+    question: "Do you offer discounts for annual billing?",
+    answer:
+      "Yes, annual billing comes with a 20% discount on all paid plans. Contact our sales team for custom enterprise pricing if you have more than 15 team members.",
+  },
 ];
 
 export default function PricingPage() {
   return (
-    <div className="py-16">
+    <div className="py-16 sm:py-24">
       {/* Header */}
-      <div className="mx-auto max-w-4xl text-center px-6">
-        <h1 className="text-4xl font-bold tracking-tight">
+      <div className="mx-auto max-w-4xl px-6 text-center">
+        <Badge variant="secondary" className="mb-4 px-3 py-1 text-xs">
+          Pricing
+        </Badge>
+        <h1 className="text-4xl font-bold tracking-tight text-[#0F172A] sm:text-5xl">
           Simple, transparent pricing
         </h1>
         <p className="mt-4 text-lg text-muted-foreground">
-          Start free and upgrade as your compliance needs grow. No hidden fees.
+          Start free and upgrade as your compliance needs grow. No hidden fees,
+          no surprises.
         </p>
       </div>
 
       {/* Plan cards */}
-      <div className="mx-auto mt-12 grid max-w-6xl grid-cols-1 gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto mt-14 grid max-w-6xl grid-cols-1 gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4">
         {plans.map((plan) => (
-          <div
+          <Card
             key={plan.name}
-            className={`flex flex-col rounded-xl border p-6 ${
+            className={`relative flex flex-col bg-white shadow-sm transition-shadow hover:shadow-md ${
               plan.highlighted
-                ? "border-primary ring-2 ring-primary/20"
-                : "border-border"
+                ? "border-[#0369A1] ring-2 ring-[#0369A1]/20"
+                : "border-border/50"
             }`}
           >
             {plan.highlighted && (
-              <span className="mb-3 inline-flex self-start rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                Most popular
-              </span>
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <Badge className="bg-[#0369A1] px-3 py-1 text-xs text-white">
+                  Most Popular
+                </Badge>
+              </div>
             )}
-            <h2 className="text-xl font-bold">{plan.name}</h2>
-            <div className="mt-3 flex items-baseline gap-1">
-              <span className="text-3xl font-bold tracking-tight">
-                {plan.price}
-              </span>
-              {plan.period && (
-                <span className="text-sm text-muted-foreground">
-                  {plan.period}
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl">{plan.name}</CardTitle>
+              <div className="mt-3 flex items-baseline gap-1">
+                <span className="text-4xl font-bold tracking-tight text-[#0F172A]">
+                  {plan.price}
                 </span>
-              )}
-            </div>
-            <p className="mt-3 text-sm text-muted-foreground">
-              {plan.description}
-            </p>
-
-            <ul className="mt-6 flex-1 space-y-3">
-              {featureRows.map((row) => {
-                const value = plan.features[row.key];
-                const isBool = typeof value === "boolean";
-                return (
-                  <li key={row.key} className="flex items-start gap-2 text-sm">
-                    {isBool ? (
-                      value ? (
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
-                      ) : (
-                        <X className="mt-0.5 h-4 w-4 shrink-0 text-gray-300" />
-                      )
+                {plan.period && (
+                  <span className="text-sm text-muted-foreground">
+                    {plan.period}
+                  </span>
+                )}
+              </div>
+              <CardDescription className="mt-2">
+                {plan.description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-1 flex-col">
+              <ul className="flex-1 space-y-3">
+                {plan.features.map((feature) => (
+                  <li
+                    key={feature.text}
+                    className="flex items-start gap-2.5 text-sm"
+                  >
+                    {feature.included ? (
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#0369A1]" />
                     ) : (
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />
+                      <X className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/40" />
                     )}
-                    <span className={isBool && !value ? "text-muted-foreground" : ""}>
-                      {isBool ? row.label : value}
+                    <span
+                      className={
+                        feature.included ? "" : "text-muted-foreground"
+                      }
+                    >
+                      {feature.text}
                     </span>
                   </li>
-                );
-              })}
-            </ul>
+                ))}
+              </ul>
 
-            <Link
-              href="/signup"
-              className={`mt-8 block rounded-md px-4 py-2.5 text-center text-sm font-medium transition-colors ${
-                plan.highlighted
-                  ? "bg-primary text-primary-foreground hover:opacity-90"
-                  : "border border-border hover:bg-muted"
-              }`}
-            >
-              {plan.cta}
-            </Link>
-          </div>
+              <Link href="/signup" className="mt-8 block">
+                <Button
+                  className={`w-full ${
+                    plan.highlighted
+                      ? "bg-[#0369A1] text-white hover:bg-[#0369A1]/90"
+                      : ""
+                  }`}
+                  variant={plan.highlighted ? "default" : "outline"}
+                >
+                  {plan.cta}
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
-      {/* Comparison table */}
-      <div className="mx-auto mt-20 max-w-6xl px-6">
-        <h2 className="text-center text-2xl font-bold">Feature comparison</h2>
-        <div className="mt-8 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="py-3 pr-4 text-left font-medium text-muted-foreground">
-                  Feature
-                </th>
-                {plans.map((p) => (
-                  <th
-                    key={p.name}
-                    className="px-4 py-3 text-center font-semibold"
-                  >
-                    {p.name}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {featureRows.map((row) => (
-                <tr key={row.key} className="border-b border-border/50">
-                  <td className="py-3 pr-4 font-medium">{row.label}</td>
-                  {plans.map((plan) => {
-                    const value = plan.features[row.key];
-                    return (
-                      <td key={plan.name} className="px-4 py-3 text-center">
-                        {typeof value === "boolean" ? (
-                          value ? (
-                            <Check className="mx-auto h-4 w-4 text-green-600" />
-                          ) : (
-                            <X className="mx-auto h-4 w-4 text-gray-300" />
-                          )
-                        ) : (
-                          value
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* FAQ Section */}
+      <div className="mx-auto mt-24 max-w-3xl px-6">
+        <h2 className="text-center text-2xl font-bold tracking-tight text-[#0F172A]">
+          Frequently asked questions
+        </h2>
+        <p className="mt-3 text-center text-muted-foreground">
+          Everything you need to know about ComplianceKit pricing.
+        </p>
+        <div className="mt-10 space-y-6">
+          {faqs.map((faq) => (
+            <Card key={faq.question} className="border-border/50 bg-white">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-semibold">
+                  {faq.question}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {faq.answer}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </div>

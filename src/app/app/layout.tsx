@@ -57,16 +57,20 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      <AppSidebar currentPath={currentPath} />
+      <AppSidebar
+        currentPath={currentPath}
+        userName={userName}
+        userEmail={userEmail}
+      />
 
       {/* Main content area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+        <header className="flex h-14 items-center justify-between border-b border-border bg-card px-6">
           <div>
-            <h2 className="text-sm font-semibold text-gray-900">
+            <h2 className="text-sm font-semibold text-foreground">
               {organization.name}
             </h2>
           </div>
@@ -74,7 +78,9 @@ export default async function AppLayout({
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-background p-6">
+          {children}
+        </main>
       </div>
     </div>
   );

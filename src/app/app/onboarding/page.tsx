@@ -8,7 +8,10 @@ import {
 import {
   ONBOARDING_QUESTIONS,
 } from "@/lib/compliance/classification";
-import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle, Shield } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 export default function OnboardingPage() {
   const [state, formAction, isPending] = useActionState<
@@ -41,93 +44,92 @@ export default function OnboardingPage() {
     }
   }
 
+  const progressValue = ((step + (hasCurrentAnswer ? 1 : 0)) / totalSteps) * 100;
+
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
-          NIS2 Applicability Assessment
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Answer 5 questions to determine your organization&apos;s NIS2
-          classification.
-        </p>
+      <div className="mb-8 flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <Shield className="h-5 w-5" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            NIS2 Applicability Assessment
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Answer 5 questions to determine your organization&apos;s NIS2
+            classification.
+          </p>
+        </div>
       </div>
 
       {/* Progress bar */}
       <div className="mb-8">
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
+        <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
           <span>
             Question {step + 1} of {totalSteps}
           </span>
-          <span>{Math.round(((step + (hasCurrentAnswer ? 1 : 0)) / totalSteps) * 100)}%</span>
+          <span>{Math.round(progressValue)}%</span>
         </div>
-        <div className="h-2 w-full rounded-full bg-gray-200">
-          <div
-            className="h-2 rounded-full bg-blue-600 transition-all duration-300"
-            style={{
-              width: `${((step + (hasCurrentAnswer ? 1 : 0)) / totalSteps) * 100}%`,
-            }}
-          />
-        </div>
+        <Progress value={progressValue} />
       </div>
 
       {state?.error && (
-        <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-6 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {state.error}
         </div>
       )}
 
       {/* Question */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="text-lg font-semibold text-gray-900">
-          {currentQuestion.label}
-        </h2>
-        {currentQuestion.description && (
-          <p className="mt-1 text-sm text-gray-500">
-            {currentQuestion.description}
-          </p>
-        )}
-
-        <div className="mt-5 space-y-2">
-          {currentQuestion.options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => handleSelect(option.value)}
-              className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors ${
-                answers[currentQuestion.id] === option.value
-                  ? "border-blue-500 bg-blue-50 text-blue-900"
-                  : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              <div
-                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">{currentQuestion.label}</CardTitle>
+          {currentQuestion.description && (
+            <CardDescription>{currentQuestion.description}</CardDescription>
+          )}
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {currentQuestion.options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => handleSelect(option.value)}
+                className={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm transition-all ${
                   answers[currentQuestion.id] === option.value
-                    ? "border-blue-500"
-                    : "border-gray-300"
+                    ? "border-primary bg-primary/5 text-foreground"
+                    : "border-transparent ring-1 ring-foreground/10 hover:bg-muted/50"
                 }`}
               >
-                {answers[currentQuestion.id] === option.value && (
-                  <div className="h-2.5 w-2.5 rounded-full bg-blue-500" />
-                )}
-              </div>
-              <span>{option.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+                <div
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                    answers[currentQuestion.id] === option.value
+                      ? "border-primary"
+                      : "border-muted-foreground/30"
+                  }`}
+                >
+                  {answers[currentQuestion.id] === option.value && (
+                    <div className="h-2.5 w-2.5 rounded-full bg-primary" />
+                  )}
+                </div>
+                <span className="font-medium">{option.label}</span>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Navigation */}
       <div className="mt-6 flex items-center justify-between">
-        <button
-          type="button"
+        <Button
+          variant="outline"
           onClick={handleBack}
           disabled={!canGoBack}
-          className="flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:invisible"
+          className={!canGoBack ? "invisible" : ""}
         >
           <ChevronLeft className="h-4 w-4" />
           Back
-        </button>
+        </Button>
 
         {isLastStep && hasCurrentAnswer ? (
           <form action={formAction}>
@@ -140,25 +142,19 @@ export default function OnboardingPage() {
                 value={answers[q.id] || ""}
               />
             ))}
-            <button
-              type="submit"
-              disabled={isPending}
-              className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
-            >
+            <Button type="submit" disabled={isPending}>
               <CheckCircle className="h-4 w-4" />
               {isPending ? "Submitting..." : "Complete Assessment"}
-            </button>
+            </Button>
           </form>
         ) : (
-          <button
-            type="button"
+          <Button
             onClick={handleNext}
             disabled={!hasCurrentAnswer}
-            className="flex items-center gap-1 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
           >
             Next
             <ChevronRight className="h-4 w-4" />
-          </button>
+          </Button>
         )}
       </div>
     </div>

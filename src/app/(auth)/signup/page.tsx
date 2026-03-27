@@ -3,6 +3,9 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { signup, type AuthActionState } from "@/server/actions/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function SignupPage() {
   const [state, formAction, pending] = useActionState<AuthActionState, FormData>(
@@ -13,93 +16,75 @@ export default function SignupPage() {
   return (
     <>
       <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+        <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
           Create your account
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Get started with ComplianceKit
+        <p className="mt-1 text-sm text-muted-foreground">
+          Start your NIS2 compliance journey today
         </p>
       </div>
 
       {state && "error" in state && (
-        <div className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-700">
+        <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
           {state.error}
         </div>
       )}
 
       <form action={formAction} className="space-y-4">
-        <div>
-          <label
-            htmlFor="fullName"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Full name
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="fullName">Full name</Label>
+          <Input
             id="fullName"
             name="fullName"
             type="text"
             autoComplete="name"
             required
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             placeholder="Jane Doe"
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Email
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
             id="email"
             name="email"
             type="email"
             autoComplete="email"
             required
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             placeholder="you@company.com"
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Password
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
             id="password"
             name="password"
             type="password"
             autoComplete="new-password"
             required
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="••••••••"
+            placeholder="Create a password"
           />
-          <p className="mt-1 text-xs text-gray-400">
+          <p className="text-xs text-muted-foreground">
             At least 8 characters, one uppercase letter, and one number
           </p>
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={pending}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full bg-[#0369A1] text-white hover:bg-[#0369A1]/90"
         >
           {pending ? "Creating account..." : "Create account"}
-        </button>
+        </Button>
       </form>
 
-      <div className="mt-6 text-center text-sm text-gray-500">
+      <div className="mt-6 text-center text-sm text-muted-foreground">
         <p>
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-medium text-blue-600 hover:text-blue-500"
+            className="font-medium text-[#0369A1] hover:text-[#0369A1]/80"
           >
             Sign in
           </Link>

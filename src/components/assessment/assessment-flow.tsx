@@ -4,6 +4,12 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { submitAnswer, completeAssessment } from "@/server/actions/assessment";
 import { ChevronLeft, ChevronRight, CheckCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface Control {
   id: string;
@@ -150,181 +156,182 @@ export function AssessmentFlow({
 
   if (!control) return null;
 
-  const answerOptions: { value: AnswerValue; label: string; color: string }[] =
-    [
-      {
-        value: "yes",
-        label: "Yes — fully implemented",
-        color: "border-green-500 bg-green-50 text-green-900",
-      },
-      {
-        value: "partial",
-        label: "Partial — some measures in place",
-        color: "border-amber-500 bg-amber-50 text-amber-900",
-      },
-      {
-        value: "no",
-        label: "No — not implemented",
-        color: "border-red-500 bg-red-50 text-red-900",
-      },
-    ];
+  const answerOptions: {
+    value: AnswerValue;
+    label: string;
+    selectedBorder: string;
+    selectedBg: string;
+    selectedText: string;
+  }[] = [
+    {
+      value: "yes",
+      label: "Yes — fully implemented",
+      selectedBorder: "border-[#16a34a]",
+      selectedBg: "bg-green-50",
+      selectedText: "text-green-900",
+    },
+    {
+      value: "partial",
+      label: "Partial — some measures in place",
+      selectedBorder: "border-[#f59e0b]",
+      selectedBg: "bg-amber-50",
+      selectedText: "text-amber-900",
+    },
+    {
+      value: "no",
+      label: "No — not implemented",
+      selectedBorder: "border-[#dc2626]",
+      selectedBg: "bg-red-50",
+      selectedText: "text-red-900",
+    },
+  ];
 
   return (
     <div className="mx-auto max-w-2xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold tracking-tight">
           Gap Assessment
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-muted-foreground">
           Evaluate each NIS2 control for your organization.
         </p>
       </div>
 
       {/* Progress */}
       <div className="mb-6">
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
+        <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
           <span>
             Control {currentIndex + 1} of {totalControls}
           </span>
           <span>{answeredCount} answered</span>
         </div>
-        <div className="h-2 w-full rounded-full bg-gray-200">
-          <div
-            className="h-2 rounded-full bg-blue-600 transition-all duration-300"
-            style={{
-              width: `${(answeredCount / totalControls) * 100}%`,
-            }}
-          />
-        </div>
+        <Progress value={(answeredCount / totalControls) * 100} />
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-4 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {error}
         </div>
       )}
 
       {/* Control card */}
-      <div className="rounded-lg border border-gray-200 bg-white p-6">
-        <div className="flex items-start gap-3 mb-4">
-          <span className="inline-flex items-center rounded bg-gray-100 px-2 py-0.5 text-xs font-mono font-medium text-gray-600">
-            {control.control_code}
-          </span>
-          <span className="text-xs text-gray-400">{control.article_ref}</span>
-        </div>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3 mb-1">
+            <Badge variant="secondary" className="font-mono">
+              {control.control_code}
+            </Badge>
+            <span className="text-xs text-muted-foreground">{control.article_ref}</span>
+          </div>
+          <CardTitle className="text-lg">{control.title}</CardTitle>
+          <CardDescription>{control.description}</CardDescription>
+        </CardHeader>
 
-        <h2 className="text-lg font-semibold text-gray-900">
-          {control.title}
-        </h2>
-        <p className="mt-2 text-sm text-gray-600">{control.description}</p>
+        <CardContent className="space-y-5">
+          {/* Guidance */}
+          <Card className="bg-muted/50">
+            <CardContent className="py-3">
+              <p className="text-xs font-medium text-muted-foreground uppercase mb-1">
+                Guidance
+              </p>
+              <p className="text-sm">{control.guidance}</p>
+            </CardContent>
+          </Card>
 
-        <div className="mt-3 rounded-md bg-gray-50 p-3">
-          <p className="text-xs font-medium text-gray-500 uppercase mb-1">
-            Guidance
-          </p>
-          <p className="text-sm text-gray-700">{control.guidance}</p>
-        </div>
-
-        {/* Answer options */}
-        <div className="mt-5 space-y-2">
-          {answerOptions.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => handleSelect(opt.value)}
-              className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors ${
-                currentAnswer?.answer === opt.value
-                  ? opt.color
-                  : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              <div
-                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
-                  currentAnswer?.answer === opt.value
-                    ? opt.value === "yes"
-                      ? "border-green-500"
-                      : opt.value === "partial"
-                        ? "border-amber-500"
-                        : "border-red-500"
-                    : "border-gray-300"
-                }`}
-              >
-                {currentAnswer?.answer === opt.value && (
+          {/* Answer options as cards */}
+          <div className="space-y-2">
+            {answerOptions.map((opt) => {
+              const isSelected = currentAnswer?.answer === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => handleSelect(opt.value)}
+                  className={`flex w-full items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm transition-all ${
+                    isSelected
+                      ? `${opt.selectedBorder} ${opt.selectedBg} ${opt.selectedText}`
+                      : "border-transparent ring-1 ring-foreground/10 hover:bg-muted/50"
+                  }`}
+                >
                   <div
-                    className={`h-2.5 w-2.5 rounded-full ${
-                      opt.value === "yes"
-                        ? "bg-green-500"
-                        : opt.value === "partial"
-                          ? "bg-amber-500"
-                          : "bg-red-500"
+                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                      isSelected
+                        ? opt.value === "yes"
+                          ? "border-[#16a34a]"
+                          : opt.value === "partial"
+                            ? "border-[#f59e0b]"
+                            : "border-[#dc2626]"
+                        : "border-muted-foreground/30"
                     }`}
-                  />
-                )}
-              </div>
-              <span>{opt.label}</span>
-            </button>
-          ))}
-        </div>
+                  >
+                    {isSelected && (
+                      <div
+                        className={`h-2.5 w-2.5 rounded-full ${
+                          opt.value === "yes"
+                            ? "bg-[#16a34a]"
+                            : opt.value === "partial"
+                              ? "bg-[#f59e0b]"
+                              : "bg-[#dc2626]"
+                        }`}
+                      />
+                    )}
+                  </div>
+                  <span className="font-medium">{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
 
-        {/* Optional note */}
-        <div className="mt-4">
-          <label
-            htmlFor="note"
-            className="block text-sm font-medium text-gray-600 mb-1"
-          >
-            Notes (optional)
-          </label>
-          <textarea
-            id="note"
-            rows={2}
-            value={currentAnswer?.note || ""}
-            onChange={(e) => handleNoteChange(e.target.value)}
-            placeholder="Add any relevant context or details..."
-            className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-          />
-        </div>
-      </div>
+          {/* Optional note */}
+          <div className="space-y-2">
+            <Label htmlFor="note">Notes (optional)</Label>
+            <Textarea
+              id="note"
+              rows={2}
+              value={currentAnswer?.note || ""}
+              onChange={(e) => handleNoteChange(e.target.value)}
+              placeholder="Add any relevant context or details..."
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Navigation */}
       <div className="mt-6 flex items-center justify-between">
-        <button
-          type="button"
+        <Button
+          variant="outline"
           onClick={handleBack}
           disabled={currentIndex === 0 || isPending}
-          className="flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 disabled:invisible"
+          className={currentIndex === 0 ? "invisible" : ""}
         >
           <ChevronLeft className="h-4 w-4" />
           Previous
-        </button>
+        </Button>
 
         <div className="flex gap-3">
           {allAnswered && (
-            <button
-              type="button"
+            <Button
               onClick={handleComplete}
               disabled={isPending}
-              className="flex items-center gap-2 rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-60"
+              className="bg-[#16a34a] hover:bg-green-700 text-white"
             >
               <CheckCircle className="h-4 w-4" />
               {isPending ? "Completing..." : "Complete Assessment"}
-            </button>
+            </Button>
           )}
 
           {!isLastControl && (
-            <button
-              type="button"
+            <Button
               onClick={handleNext}
               disabled={!currentAnswer || isPending}
-              className="flex items-center gap-1 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
             >
               {isPending ? "Saving..." : "Next"}
               <ChevronRight className="h-4 w-4" />
-            </button>
+            </Button>
           )}
 
           {isLastControl && !allAnswered && (
-            <button
-              type="button"
+            <Button
               onClick={() => {
                 // Save current and go to first unanswered
                 if (currentAnswer) {
@@ -343,10 +350,9 @@ export function AssessmentFlow({
                 }
               }}
               disabled={!currentAnswer || isPending}
-              className="flex items-center gap-1 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
             >
               Go to unanswered
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -367,10 +373,10 @@ export function AssessmentFlow({
             title={`${c.control_code}: ${c.title}`}
             className={`h-3 w-3 rounded-full transition-colors ${
               i === currentIndex
-                ? "bg-blue-600"
+                ? "bg-primary"
                 : answers[c.id]
-                  ? "bg-blue-300"
-                  : "bg-gray-300"
+                  ? "bg-primary/40"
+                  : "bg-muted-foreground/20"
             }`}
           />
         ))}

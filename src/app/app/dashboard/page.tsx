@@ -9,9 +9,13 @@ import {
   ArrowRight,
   BarChart3,
   AlertTriangle,
-  CheckCircle,
-  XCircle,
+  CheckCircle2,
+  XOctagon,
+  Shield,
 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 export default async function DashboardPage() {
   const result = await getCurrentOrganization();
@@ -60,143 +64,245 @@ export default async function DashboardPage() {
   }
 
   const redCount = controlStatuses.filter((s: any) => s.rag === "red").length;
-  const amberCount = controlStatuses.filter((s: any) => s.rag === "amber").length;
-  const greenCount = controlStatuses.filter((s: any) => s.rag === "green").length;
+  const amberCount = controlStatuses.filter(
+    (s: any) => s.rag === "amber",
+  ).length;
+  const greenCount = controlStatuses.filter(
+    (s: any) => s.rag === "green",
+  ).length;
+  const totalControls = controlStatuses.length;
+  const scorePct = latestAssessment
+    ? Number(latestAssessment.score_pct)
+    : 0;
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-      <p className="mt-1 text-sm text-gray-500">
-        Welcome to {organization.name}
-      </p>
+    <div className="mx-auto max-w-6xl space-y-6">
+      {/* Page header */}
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          Dashboard
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Welcome to {organization.name}
+        </p>
+      </div>
 
+      {/* Onboarding CTA */}
       {!onboardingComplete && (
-        <div className="mt-6 rounded-lg border border-blue-200 bg-blue-50 p-6">
-          <h2 className="text-lg font-semibold text-blue-900">
-            Get started with ComplianceKit
-          </h2>
-          <p className="mt-1 text-sm text-blue-700">
-            Complete your onboarding to determine your NIS2 applicability and
-            begin your compliance assessment.
-          </p>
-          <Link
-            href="/app/onboarding"
-            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            Start Onboarding
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+        <Card className="relative overflow-hidden border-2 border-primary/20">
+          <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary via-accent to-primary" />
+          <CardContent className="flex items-center justify-between py-8 pl-8 pr-6">
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold text-foreground">
+                Get started with ComplianceKit
+              </h2>
+              <p className="max-w-lg text-sm text-muted-foreground">
+                Complete your onboarding to determine your NIS2 applicability
+                and begin your compliance assessment.
+              </p>
+              <Link
+                href="/app/onboarding"
+                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+              >
+                Start Onboarding
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+            <Shield className="hidden h-20 w-20 text-primary/10 md:block" />
+          </CardContent>
+        </Card>
       )}
 
+      {/* Dashboard content when onboarding is complete */}
       {onboardingComplete && (
         <>
-          {/* Score cards */}
+          {/* Top metric cards */}
           {latestAssessment && (
-            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
-              <div className="rounded-lg border border-gray-200 bg-white p-5">
-                <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-                  <BarChart3 className="h-4 w-4" />
-                  Compliance Score
-                </div>
-                <p className="mt-2 text-3xl font-bold text-gray-900">
-                  {Number(latestAssessment.score_pct).toFixed(0)}%
-                </p>
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-5">
-                <div className="flex items-center gap-2 text-sm font-medium text-red-600">
-                  <XCircle className="h-4 w-4" />
-                  Red Controls
-                </div>
-                <p className="mt-2 text-3xl font-bold text-red-600">
-                  {redCount}
-                </p>
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-5">
-                <div className="flex items-center gap-2 text-sm font-medium text-amber-600">
-                  <AlertTriangle className="h-4 w-4" />
-                  Amber Controls
-                </div>
-                <p className="mt-2 text-3xl font-bold text-amber-600">
-                  {amberCount}
-                </p>
-              </div>
-              <div className="rounded-lg border border-gray-200 bg-white p-5">
-                <div className="flex items-center gap-2 text-sm font-medium text-green-600">
-                  <CheckCircle className="h-4 w-4" />
-                  Green Controls
-                </div>
-                <p className="mt-2 text-3xl font-bold text-green-600">
-                  {greenCount}
-                </p>
-              </div>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {/* Compliance Score */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Compliance Score
+                  </CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end gap-3">
+                    <span className="text-3xl font-bold text-foreground">
+                      {scorePct.toFixed(0)}%
+                    </span>
+                  </div>
+                  <Progress
+                    value={scorePct}
+                    className="mt-3 h-2"
+                  />
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {totalControls} controls assessed
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Red Controls */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Red Controls
+                  </CardTitle>
+                  <XOctagon className="h-4 w-4 text-[#dc2626]" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end gap-3">
+                    <span className="text-3xl font-bold text-[#dc2626]">
+                      {redCount}
+                    </span>
+                    <Badge
+                      variant="destructive"
+                      className="mb-1 text-[10px]"
+                    >
+                      Critical
+                    </Badge>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Require immediate attention
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Amber Controls */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Amber Controls
+                  </CardTitle>
+                  <AlertTriangle className="h-4 w-4 text-[#f59e0b]" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end gap-3">
+                    <span className="text-3xl font-bold text-[#f59e0b]">
+                      {amberCount}
+                    </span>
+                    <Badge className="mb-1 border-[#f59e0b]/30 bg-[#f59e0b]/10 text-[10px] text-[#f59e0b]">
+                      Needs Attention
+                    </Badge>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Partially implemented
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Green Controls */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    Green Controls
+                  </CardTitle>
+                  <CheckCircle2 className="h-4 w-4 text-[#16a34a]" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end gap-3">
+                    <span className="text-3xl font-bold text-[#16a34a]">
+                      {greenCount}
+                    </span>
+                    <Badge className="mb-1 border-[#16a34a]/30 bg-[#16a34a]/10 text-[10px] text-[#16a34a]">
+                      Compliant
+                    </Badge>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Fully implemented
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           )}
 
-          {/* Quick actions */}
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Link
-              href="/app/assessment"
-              className="flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-5 transition-colors hover:bg-gray-50"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
-                <ClipboardCheck className="h-5 w-5 text-blue-700" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Assessment</p>
-                <p className="text-sm text-gray-500">
-                  {latestAssessment
-                    ? `${openActions} open actions`
-                    : "Start your first assessment"}
-                </p>
-              </div>
-            </Link>
-
-            <Link
-              href="/app/evidence"
-              className="flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-5 transition-colors hover:bg-gray-50"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100">
-                <FileCheck className="h-5 w-5 text-green-700" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Evidence</p>
-                <p className="text-sm text-gray-500">Track compliance evidence</p>
-              </div>
-            </Link>
-
-            <Link
-              href="/app/policies"
-              className="flex items-center gap-4 rounded-lg border border-gray-200 bg-white p-5 transition-colors hover:bg-gray-50"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
-                <FileText className="h-5 w-5 text-purple-700" />
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Policies</p>
-                <p className="text-sm text-gray-500">Generate policy documents</p>
-              </div>
-            </Link>
-          </div>
-
           {/* NIS2 Classification */}
-          <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">
-              NIS2 Classification
-            </h3>
-            <div className="flex items-center gap-4">
-              <span
-                className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
-                  organization.nis2_applicable
-                    ? "bg-blue-100 text-blue-700"
-                    : "bg-gray-100 text-gray-700"
-                }`}
-              >
-                {organization.nis2_applicable ? "NIS2 Applicable" : "Out of Scope"}
-              </span>
-              <span className="text-sm text-gray-600 capitalize">
-                Entity class: {organization.entity_class?.replace("_", " ")}
-              </span>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                NIS2 Classification
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <Badge
+                  variant={
+                    organization.nis2_applicable ? "default" : "secondary"
+                  }
+                  className="text-xs"
+                >
+                  {organization.nis2_applicable
+                    ? "NIS2 Applicable"
+                    : "Out of Scope"}
+                </Badge>
+                {organization.entity_class && (
+                  <span className="text-sm text-muted-foreground capitalize">
+                    Entity class:{" "}
+                    <span className="font-medium text-foreground">
+                      {organization.entity_class.replace("_", " ")}
+                    </span>
+                  </span>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Actions */}
+          <div>
+            <h2 className="mb-3 text-sm font-semibold text-foreground">
+              Quick Actions
+            </h2>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <Link href="/app/assessment" className="group">
+                <Card className="h-full transition-colors duration-200 group-hover:border-primary/30 group-hover:bg-muted/50">
+                  <CardContent className="flex items-start gap-4 pt-6">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                      <ClipboardCheck className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Assessment</p>
+                      <p className="mt-0.5 text-sm text-muted-foreground">
+                        {latestAssessment
+                          ? `${openActions} open remediation actions`
+                          : "Start your first compliance assessment"}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+
+              <Link href="/app/evidence" className="group">
+                <Card className="h-full transition-colors duration-200 group-hover:border-[#16a34a]/30 group-hover:bg-muted/50">
+                  <CardContent className="flex items-start gap-4 pt-6">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#16a34a]/10">
+                      <FileCheck className="h-5 w-5 text-[#16a34a]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Evidence</p>
+                      <p className="mt-0.5 text-sm text-muted-foreground">
+                        Upload and track compliance evidence
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+
+              <Link href="/app/policies" className="group">
+                <Card className="h-full transition-colors duration-200 group-hover:border-accent/30 group-hover:bg-muted/50">
+                  <CardContent className="flex items-start gap-4 pt-6">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
+                      <FileText className="h-5 w-5 text-accent" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-foreground">Policies</p>
+                      <p className="mt-0.5 text-sm text-muted-foreground">
+                        Generate and manage policy documents
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             </div>
           </div>
         </>

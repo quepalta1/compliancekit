@@ -8,6 +8,10 @@ import {
 import { UpgradeButton } from "@/components/billing/upgrade-button";
 import { ManageBillingButton } from "@/components/billing/manage-billing-button";
 import { BillingBanner } from "@/components/billing/billing-banner";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 const planHighlights: Record<
   string,
@@ -97,8 +101,8 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900">Billing</h1>
-      <p className="mt-1 text-sm text-gray-500">
+      <h1 className="text-2xl font-bold tracking-tight">Billing</h1>
+      <p className="mt-1 text-sm text-muted-foreground">
         Manage your subscription and billing details
       </p>
 
@@ -117,87 +121,89 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
       )}
 
       {/* Current Plan */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
-            <CreditCard className="h-5 w-5 text-blue-700" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">
-              Current Plan
-            </h2>
-            <p className="text-sm text-gray-500">
-              {currentPlan?.name ?? "Free"} plan
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div>
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
-            </p>
-            <p className="mt-1 text-sm text-gray-900">
-              <span
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                  subscription?.status === "active"
-                    ? "bg-green-100 text-green-700"
-                    : subscription?.status === "trialing"
-                      ? "bg-blue-100 text-blue-700"
-                      : "bg-gray-100 text-gray-700"
-                }`}
-              >
-                {subscription?.status ?? "active"}
-              </span>
-            </p>
-          </div>
-          {subscription?.current_period_start && (
+      <Card className="mt-6">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+              <CreditCard className="h-5 w-5 text-blue-700" />
+            </div>
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Period Start
+              <CardTitle>Current Plan</CardTitle>
+              <CardDescription>{currentPlan?.name ?? "Free"} plan</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Status
               </p>
-              <p className="mt-1 text-sm text-gray-900">
-                {new Date(
-                  subscription.current_period_start,
-                ).toLocaleDateString()}
+              <p className="mt-1">
+                <Badge
+                  variant="secondary"
+                  className={
+                    subscription?.status === "active"
+                      ? "bg-green-100 text-green-700 border-green-200"
+                      : subscription?.status === "trialing"
+                        ? "bg-blue-100 text-blue-700 border-blue-200"
+                        : ""
+                  }
+                >
+                  {subscription?.status ?? "active"}
+                </Badge>
               </p>
             </div>
-          )}
-          {subscription?.current_period_end && (
-            <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Period End
-              </p>
-              <p className="mt-1 text-sm text-gray-900">
-                {new Date(
-                  subscription.current_period_end,
-                ).toLocaleDateString()}
-              </p>
+            {subscription?.current_period_start && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Period Start
+                </p>
+                <p className="mt-1 text-sm">
+                  {new Date(
+                    subscription.current_period_start,
+                  ).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+            {subscription?.current_period_end && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Period End
+                </p>
+                <p className="mt-1 text-sm">
+                  {new Date(
+                    subscription.current_period_end,
+                  ).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {subscription?.cancel_at_period_end && (
+            <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              Your subscription will be cancelled at the end of the current
+              billing period.
             </div>
           )}
-        </div>
 
-        {subscription?.cancel_at_period_end && (
-          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-            Your subscription will be cancelled at the end of the current
-            billing period.
+          <Separator className="my-4" />
+
+          <div>
+            {hasStripeCustomer ? (
+              <ManageBillingButton />
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Subscribe to a paid plan to access billing management.
+              </p>
+            )}
           </div>
-        )}
-
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          {hasStripeCustomer ? (
-            <ManageBillingButton />
-          ) : (
-            <p className="text-sm text-gray-400">
-              Subscribe to a paid plan to access billing management.
-            </p>
-          )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Pricing Grid */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-semibold mb-4">
           Available Plans
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -210,50 +216,52 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
             const isFree = plan.code === "free";
 
             return (
-              <div
+              <Card
                 key={plan.id}
-                className={`relative rounded-lg border bg-white p-5 ${
+                className={
                   highlights.recommended
-                    ? "border-blue-500 ring-1 ring-blue-500"
-                    : "border-gray-200"
-                }`}
+                    ? "border-primary ring-1 ring-primary relative"
+                    : ""
+                }
               >
                 {highlights.recommended && (
-                  <span className="absolute -top-2.5 left-4 rounded-full bg-blue-600 px-2.5 py-0.5 text-xs font-medium text-white">
-                    Recommended
-                  </span>
+                  <Badge className="absolute -top-2.5 left-4">
+                    Most Popular
+                  </Badge>
                 )}
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {plan.name}
-                </h3>
-                <p className="mt-1 text-2xl font-bold text-gray-900">
-                  {highlights.price}
-                </p>
-                <ul className="mt-4 space-y-2">
-                  {highlights.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-center gap-2 text-sm text-gray-600"
-                    >
-                      <Check className="h-4 w-4 text-green-500 shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-5">
-                  {isCurrent ? (
-                    <span className="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-500">
-                      Current Plan
-                    </span>
-                  ) : isFree ? (
-                    <span className="inline-flex w-full items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-400">
-                      Default
-                    </span>
-                  ) : (
-                    <UpgradeButton planCode={plan.code} />
-                  )}
-                </div>
-              </div>
+                <CardHeader>
+                  <CardTitle className="text-lg">{plan.name}</CardTitle>
+                  <p className="text-2xl font-bold">
+                    {highlights.price}
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 mb-5">
+                    {highlights.features.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-center gap-2 text-sm text-muted-foreground"
+                      >
+                        <Check className="h-4 w-4 text-[#16a34a] shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                  <div>
+                    {isCurrent ? (
+                      <Button variant="outline" className="w-full" disabled>
+                        Current Plan
+                      </Button>
+                    ) : isFree ? (
+                      <Button variant="outline" className="w-full" disabled>
+                        Default
+                      </Button>
+                    ) : (
+                      <UpgradeButton planCode={plan.code} />
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

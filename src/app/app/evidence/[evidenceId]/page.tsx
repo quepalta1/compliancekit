@@ -14,6 +14,11 @@ import {
 } from "lucide-react";
 import { deleteEvidenceItem } from "@/server/actions/evidence";
 import { FileUpload } from "@/components/evidence/file-upload";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ evidenceId: string }>;
@@ -21,27 +26,28 @@ interface Props {
 
 function getEvidenceStatus(expiresAt: string | null): {
   label: string;
+  variant: "secondary" | "destructive" | "outline";
   className: string;
 } {
   if (!expiresAt) {
-    return { label: "Valid", className: "bg-green-100 text-green-700" };
+    return { label: "Valid", variant: "secondary", className: "bg-green-100 text-green-700 border-green-200" };
   }
 
   const now = new Date();
   const expires = new Date(expiresAt);
 
   if (expires < now) {
-    return { label: "Expired", className: "bg-red-100 text-red-700" };
+    return { label: "Expired", variant: "destructive", className: "" };
   }
 
   const ninetyDays = new Date();
   ninetyDays.setDate(ninetyDays.getDate() + 90);
 
   if (expires <= ninetyDays) {
-    return { label: "Expiring", className: "bg-amber-100 text-amber-700" };
+    return { label: "Expiring", variant: "secondary", className: "bg-amber-100 text-amber-700 border-amber-200" };
   }
 
-  return { label: "Valid", className: "bg-green-100 text-green-700" };
+  return { label: "Valid", variant: "secondary", className: "bg-green-100 text-green-700 border-green-200" };
 }
 
 export default async function EvidenceDetailPage({ params }: Props) {
@@ -100,10 +106,7 @@ export default async function EvidenceDetailPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-3xl">
       {/* Back link */}
-      <Link
-        href="/app/evidence"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
-      >
+      <Link href="/app/evidence" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "mb-4")}>
         <ArrowLeft className="h-4 w-4" />
         Back to Evidence
       </Link>
@@ -112,151 +115,143 @@ export default async function EvidenceDetailPage({ params }: Props) {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold tracking-tight">
               {evidence.title}
             </h1>
-            <span
-              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${status.className}`}
-            >
+            <Badge variant={status.variant} className={status.className}>
               {status.label}
-            </span>
+            </Badge>
           </div>
           {evidence.description && (
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               {evidence.description}
             </p>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href={`/app/evidence/${evidenceId}/edit`}
-            className="flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
+          <Link href={`/app/evidence/${evidenceId}/edit`} className={buttonVariants({ variant: "outline", size: "sm" })}>
             <Pencil className="h-4 w-4" />
             Edit
           </Link>
           <form action={deleteWithId}>
-            <button
-              type="submit"
-              className="flex items-center gap-1.5 rounded-lg border border-red-300 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
-            >
+            <Button variant="destructive" size="sm" type="submit">
               <Trash2 className="h-4 w-4" />
               Delete
-            </button>
+            </Button>
           </form>
         </div>
       </div>
 
       {/* Details */}
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-            <Calendar className="h-4 w-4" />
-            Expiration Date
-          </div>
-          <p className="mt-1 text-sm text-gray-900">
-            {evidence.expires_at
-              ? new Date(evidence.expires_at).toLocaleDateString()
-              : "No expiration"}
-          </p>
-        </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-            <FileCheck className="h-4 w-4" />
-            Status
-          </div>
-          <p className="mt-1">
-            <span
-              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${status.className}`}
-            >
-              {status.label}
-            </span>
-          </p>
-        </div>
+        <Card>
+          <CardContent className="pt-1">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Calendar className="h-4 w-4" />
+              Expiration Date
+            </div>
+            <p className="mt-1 text-sm">
+              {evidence.expires_at
+                ? new Date(evidence.expires_at).toLocaleDateString()
+                : "No expiration"}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-1">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <FileCheck className="h-4 w-4" />
+              Status
+            </div>
+            <p className="mt-1">
+              <Badge variant={status.variant} className={status.className}>
+                {status.label}
+              </Badge>
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Linked Controls */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Shield className="h-4 w-4 text-gray-500" />
-          <h2 className="text-sm font-medium text-gray-900">
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <Shield className="h-4 w-4 text-muted-foreground" />
             Linked Controls
-          </h2>
-        </div>
-        {controls.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            No controls linked to this evidence item.
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {controls.map((control: any) =>
-              control ? (
-                <div
-                  key={control.id}
-                  className="flex items-center gap-3 rounded-md bg-gray-50 px-3 py-2"
-                >
-                  <span className="inline-flex items-center rounded bg-gray-200 px-1.5 py-0.5 text-xs font-mono font-medium text-gray-600">
-                    {control.control_code}
-                  </span>
-                  <span className="text-sm text-gray-700">
-                    {control.title}
-                  </span>
-                </div>
-              ) : null,
-            )}
-          </div>
-        )}
-      </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {controls.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No controls linked to this evidence item.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {controls.map((control: any) =>
+                control ? (
+                  <Badge key={control.id} variant="secondary" className="gap-1.5">
+                    <span className="font-mono text-xs">{control.control_code}</span>
+                    <span>{control.title}</span>
+                  </Badge>
+                ) : null,
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Files */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <FileText className="h-4 w-4 text-gray-500" />
-          <h2 className="text-sm font-medium text-gray-900">Files</h2>
-        </div>
-
-        {filesWithUrls.length === 0 ? (
-          <p className="mb-4 text-sm text-gray-500">
-            No files uploaded yet.
-          </p>
-        ) : (
-          <div className="mb-4 space-y-2">
-            {filesWithUrls.map((file: any) => (
-              <div
-                key={file.id}
-                className="flex items-center justify-between rounded-md border border-gray-100 bg-gray-50 px-3 py-2.5"
-              >
-                <div className="flex items-center gap-3">
-                  <FileText className="h-4 w-4 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">
-                      {file.file_name}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {(file.file_size / 1024).toFixed(1)} KB
-                      {" · "}
-                      {new Date(file.created_at).toLocaleDateString()}
-                    </p>
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <FileText className="h-4 w-4 text-muted-foreground" />
+            Files
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filesWithUrls.length === 0 ? (
+            <p className="mb-4 text-sm text-muted-foreground">
+              No files uploaded yet.
+            </p>
+          ) : (
+            <div className="mb-4 space-y-2">
+              {filesWithUrls.map((file: any) => (
+                <div
+                  key={file.id}
+                  className="flex items-center justify-between rounded-lg border bg-muted/50 px-3 py-2.5"
+                >
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">
+                        {file.file_name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {(file.file_size / 1024).toFixed(1)} KB
+                        {" · "}
+                        {new Date(file.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
+                  {file.signedUrl && (
+                    <a
+                      href={file.signedUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={buttonVariants({ variant: "ghost", size: "sm" })}
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Download
+                    </a>
+                  )}
                 </div>
-                {file.signedUrl && (
-                  <a
-                    href={file.signedUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium text-blue-700 hover:bg-blue-50"
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    Download
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
 
-        <FileUpload evidenceItemId={evidenceId} />
-      </div>
+          <FileUpload evidenceItemId={evidenceId} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

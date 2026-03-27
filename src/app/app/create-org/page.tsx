@@ -5,6 +5,10 @@ import {
   createOrganization,
   type OrgActionState,
 } from "@/server/actions/organization";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function CreateOrganizationPage() {
   const [state, formAction, isPending] = useActionState<
@@ -40,78 +44,66 @@ export default function CreateOrganizationPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-muted/30 px-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-lg font-bold text-white">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground">
             CK
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight">
             Create your organization
           </h1>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             Set up your organization to start your compliance journey.
           </p>
         </div>
 
         {/* Form */}
-        <form action={formAction} className="space-y-5">
-          {state?.error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {state.error}
-            </div>
-          )}
+        <Card>
+          <CardContent className="pt-2">
+            <form action={formAction} className="space-y-5">
+              {state?.error && (
+                <div className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                  {state.error}
+                </div>
+              )}
 
-          <div>
-            <label
-              htmlFor="name"
-              className="mb-1.5 block text-sm font-medium text-gray-700"
-            >
-              Organization name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              value={name}
-              onChange={handleNameChange}
-              placeholder="Acme Corp"
-              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="name">Organization name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={name}
+                  onChange={handleNameChange}
+                  placeholder="Acme Corp"
+                />
+              </div>
 
-          <div>
-            <label
-              htmlFor="slug"
-              className="mb-1.5 block text-sm font-medium text-gray-700"
-            >
-              URL slug
-            </label>
-            <input
-              id="slug"
-              name="slug"
-              type="text"
-              required
-              value={slug}
-              onChange={handleSlugChange}
-              placeholder="acme-corp"
-              className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-            />
-            <p className="mt-1.5 text-xs text-gray-400">
-              Lowercase letters, numbers, and hyphens only.
-            </p>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="slug">URL slug</Label>
+                <Input
+                  id="slug"
+                  name="slug"
+                  type="text"
+                  required
+                  value={slug}
+                  onChange={handleSlugChange}
+                  placeholder="acme-corp"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Lowercase letters, numbers, and hyphens only.
+                </p>
+              </div>
 
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isPending ? "Creating..." : "Create organization"}
-          </button>
-        </form>
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? "Creating..." : "Create organization"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

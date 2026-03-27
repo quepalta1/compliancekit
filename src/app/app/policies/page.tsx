@@ -12,27 +12,34 @@ import {
   Download,
 } from "lucide-react";
 import { AutoRefresh } from "@/components/policies/auto-refresh";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 
 const statusConfig = {
   queued: {
     label: "Queued",
     icon: Clock,
-    colors: "bg-gray-100 text-gray-700",
+    variant: "secondary" as const,
+    className: "",
   },
   generating: {
     label: "Generating",
     icon: Loader2,
-    colors: "bg-blue-100 text-blue-700",
+    variant: "secondary" as const,
+    className: "bg-blue-100 text-blue-700 border-blue-200",
   },
   completed: {
     label: "Completed",
     icon: CheckCircle,
-    colors: "bg-green-100 text-green-700",
+    variant: "secondary" as const,
+    className: "bg-green-100 text-green-700 border-green-200",
   },
   failed: {
     label: "Failed",
     icon: AlertTriangle,
-    colors: "bg-red-100 text-red-700",
+    variant: "destructive" as const,
+    className: "",
   },
 } as const;
 
@@ -68,15 +75,12 @@ export default async function PoliciesPage() {
       {hasInProgress && <AutoRefresh intervalMs={5000} />}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Policies</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold tracking-tight">Policies</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Generate and manage compliance policy documents
           </p>
         </div>
-        <Link
-          href="/app/policies/new"
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <Link href="/app/policies/new" className={buttonVariants()}>
           <Plus className="h-4 w-4" />
           Generate Policy
         </Link>
@@ -84,40 +88,36 @@ export default async function PoliciesPage() {
 
       {/* Policy Templates */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-semibold mb-4">
           Available Templates
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {(templates ?? []).map((template: any) => (
-            <div
-              key={template.id}
-              className="rounded-lg border border-gray-200 bg-white p-5"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
-                  <FileText className="h-5 w-5 text-purple-700" />
+            <Card key={template.id}>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
+                    <FileText className="h-5 w-5 text-purple-700" />
+                  </div>
+                  <div>
+                    <CardTitle>{template.name}</CardTitle>
+                    <p className="text-xs text-muted-foreground font-mono">
+                      {template.code}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">
-                    {template.name}
-                  </h3>
-                  <p className="text-xs text-gray-400 font-mono">
-                    {template.code}
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600">{template.description}</p>
-              <Link
-                href={`/app/policies/new?template=${template.id}`}
-                className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500"
-              >
-                Generate
-                <Plus className="h-3.5 w-3.5" />
-              </Link>
-            </div>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="mb-4">{template.description}</CardDescription>
+                <Link href={`/app/policies/new?template=${template.id}`} className={buttonVariants({ variant: "link", className: "p-0 h-auto" })}>
+                  Generate
+                  <Plus className="h-3.5 w-3.5" />
+                </Link>
+              </CardContent>
+            </Card>
           ))}
           {(!templates || templates.length === 0) && (
-            <p className="text-sm text-gray-500 col-span-full">
+            <p className="text-sm text-muted-foreground col-span-full">
               No policy templates available yet.
             </p>
           )}
@@ -126,17 +126,19 @@ export default async function PoliciesPage() {
 
       {/* Generated Documents */}
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-semibold mb-4">
           Generated Documents
         </h2>
         {(!documents || documents.length === 0) ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-8 text-center">
-            <FileText className="mx-auto h-10 w-10 text-gray-300" />
-            <p className="mt-3 text-sm text-gray-500">
-              No policy documents generated yet. Use the templates above to
-              create your first policy.
-            </p>
-          </div>
+          <Card>
+            <CardContent className="py-8 text-center">
+              <FileText className="mx-auto h-10 w-10 text-muted-foreground/30" />
+              <p className="mt-3 text-sm text-muted-foreground">
+                No policy documents generated yet. Use the templates above to
+                create your first policy.
+              </p>
+            </CardContent>
+          </Card>
         ) : (
           <div className="space-y-3">
             {documents.map((doc: any) => {
@@ -146,57 +148,51 @@ export default async function PoliciesPage() {
               const StatusIcon = status.icon;
 
               return (
-                <div
-                  key={doc.id}
-                  className="flex items-center gap-4 rounded-lg border border-gray-200 bg-white px-5 py-4"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
-                    <FileText className="h-5 w-5 text-gray-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">
-                      {(doc.policy_templates as { name: string } | null)?.name ??
-                        "Policy Document"}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Created{" "}
-                      {new Date(doc.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${status.colors}`}
-                  >
-                    <StatusIcon className="h-3.5 w-3.5" />
-                    {status.label}
-                  </span>
-                  {doc.status === "completed" && (doc.pdf_path || doc.docx_path) && (
-                    <div className="flex items-center gap-2">
-                      {doc.pdf_path && (
-                        <a
-                          href={`/api/policies/${doc.id}/download?format=pdf`}
-                          className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                          PDF
-                        </a>
-                      )}
-                      {doc.docx_path && (
-                        <a
-                          href={`/api/policies/${doc.id}/download?format=docx`}
-                          className="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                          DOCX
-                        </a>
-                      )}
+                <Card key={doc.id}>
+                  <CardContent className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                      <FileText className="h-5 w-5 text-muted-foreground" />
                     </div>
-                  )}
-                  {doc.status === "failed" && doc.error_message && (
-                    <span className="text-xs text-red-600 max-w-48 truncate">
-                      {doc.error_message}
-                    </span>
-                  )}
-                </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">
+                        {(doc.policy_templates as { name: string } | null)?.name ??
+                          "Policy Document"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Created{" "}
+                        {new Date(doc.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <Badge
+                      variant={status.variant}
+                      className={status.className}
+                    >
+                      <StatusIcon className="h-3.5 w-3.5" />
+                      {status.label}
+                    </Badge>
+                    {doc.status === "completed" && (doc.pdf_path || doc.docx_path) && (
+                      <div className="flex items-center gap-2">
+                        {doc.pdf_path && (
+                          <a href={`/api/policies/${doc.id}/download?format=pdf`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+                            <Download className="h-3.5 w-3.5" />
+                            PDF
+                          </a>
+                        )}
+                        {doc.docx_path && (
+                          <a href={`/api/policies/${doc.id}/download?format=docx`} className={buttonVariants({ variant: "outline", size: "sm" })}>
+                            <Download className="h-3.5 w-3.5" />
+                            DOCX
+                          </a>
+                        )}
+                      </div>
+                    )}
+                    {doc.status === "failed" && doc.error_message && (
+                      <span className="text-xs text-destructive max-w-48 truncate">
+                        {doc.error_message}
+                      </span>
+                    )}
+                  </CardContent>
+                </Card>
               );
             })}
           </div>

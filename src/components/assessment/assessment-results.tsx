@@ -2,6 +2,9 @@
 
 import { BarChart3, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 
 interface Assessment {
   id: string;
@@ -39,16 +42,22 @@ interface Props {
   remediationActions: RemediationAction[];
 }
 
-const ragColors = {
-  red: { bg: "bg-red-100", text: "text-red-700", dot: "bg-red-500" },
-  amber: { bg: "bg-amber-100", text: "text-amber-700", dot: "bg-amber-500" },
-  green: { bg: "bg-green-100", text: "text-green-700", dot: "bg-green-500" },
+const ragDot: Record<string, string> = {
+  red: "bg-[#dc2626]",
+  amber: "bg-[#f59e0b]",
+  green: "bg-[#16a34a]",
 };
 
-const priorityColors = {
-  high: "bg-red-100 text-red-700",
-  medium: "bg-amber-100 text-amber-700",
-  low: "bg-green-100 text-green-700",
+const ragBadge: Record<string, string> = {
+  red: "bg-red-100 text-red-700 border-red-200",
+  amber: "bg-amber-100 text-amber-700 border-amber-200",
+  green: "bg-green-100 text-green-700 border-green-200",
+};
+
+const priorityBadge: Record<string, { className: string; variant: "destructive" | "secondary" | "outline" }> = {
+  high: { className: "", variant: "destructive" },
+  medium: { className: "bg-amber-100 text-amber-700 border-amber-200", variant: "secondary" },
+  low: { className: "bg-green-100 text-green-700 border-green-200", variant: "secondary" },
 };
 
 export function AssessmentResults({
@@ -68,17 +77,17 @@ export function AssessmentResults({
     <div className="mx-auto max-w-4xl">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold tracking-tight">
             Assessment Results
           </h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Completed{" "}
             {new Date(assessment.completed_at).toLocaleDateString()}
           </p>
         </div>
         <Link
           href="/app/assessment"
-          className="text-sm font-medium text-blue-600 hover:text-blue-500"
+          className={buttonVariants({ variant: "outline" })}
         >
           Back to assessments
         </Link>
@@ -86,128 +95,121 @@ export function AssessmentResults({
 
       {/* Score overview */}
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-4">
-        <div className="rounded-lg border border-gray-200 bg-white p-5">
-          <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-            <BarChart3 className="h-4 w-4" />
-            Overall Score
-          </div>
-          <p className="mt-2 text-3xl font-bold text-gray-900">
-            {score.toFixed(0)}%
-          </p>
-        </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-5">
-          <div className="flex items-center gap-2 text-sm font-medium text-red-600">
-            <XCircle className="h-4 w-4" />
-            Red
-          </div>
-          <p className="mt-2 text-3xl font-bold text-red-600">{redCount}</p>
-        </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-5">
-          <div className="flex items-center gap-2 text-sm font-medium text-amber-600">
-            <AlertTriangle className="h-4 w-4" />
-            Amber
-          </div>
-          <p className="mt-2 text-3xl font-bold text-amber-600">
-            {amberCount}
-          </p>
-        </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-5">
-          <div className="flex items-center gap-2 text-sm font-medium text-green-600">
-            <CheckCircle className="h-4 w-4" />
-            Green
-          </div>
-          <p className="mt-2 text-3xl font-bold text-green-600">
-            {greenCount}
-          </p>
-        </div>
+        <Card>
+          <CardContent className="pt-1">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <BarChart3 className="h-4 w-4" />
+              Overall Score
+            </div>
+            <p className="mt-2 text-3xl font-bold">{score.toFixed(0)}%</p>
+          </CardContent>
+        </Card>
+        <Card className="border-l-4 border-l-[#dc2626]">
+          <CardContent className="pt-1">
+            <div className="flex items-center gap-2 text-sm font-medium text-[#dc2626]">
+              <XCircle className="h-4 w-4" />
+              Red
+            </div>
+            <p className="mt-2 text-3xl font-bold text-[#dc2626]">{redCount}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-l-4 border-l-[#f59e0b]">
+          <CardContent className="pt-1">
+            <div className="flex items-center gap-2 text-sm font-medium text-[#f59e0b]">
+              <AlertTriangle className="h-4 w-4" />
+              Amber
+            </div>
+            <p className="mt-2 text-3xl font-bold text-[#f59e0b]">{amberCount}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-l-4 border-l-[#16a34a]">
+          <CardContent className="pt-1">
+            <div className="flex items-center gap-2 text-sm font-medium text-[#16a34a]">
+              <CheckCircle className="h-4 w-4" />
+              Green
+            </div>
+            <p className="mt-2 text-3xl font-bold text-[#16a34a]">{greenCount}</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Control RAG overview */}
       <div className="mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Control Status
-        </h2>
-        <div className="space-y-2">
-          {controlStatuses.map((cs) => {
-            const control = controlMap.get(cs.control_id);
-            const colors =
-              ragColors[cs.rag as keyof typeof ragColors] || ragColors.red;
-            return (
-              <div
-                key={cs.control_id}
-                className="flex items-center gap-4 rounded-lg border border-gray-200 bg-white px-4 py-3"
-              >
-                <div className={`h-3 w-3 rounded-full ${colors.dot}`} />
-                <span className="text-xs font-mono text-gray-500 w-16">
-                  {control?.control_code}
-                </span>
-                <span className="flex-1 text-sm text-gray-900">
-                  {control?.title}
-                </span>
-                <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${colors.bg} ${colors.text}`}
+        <h2 className="text-lg font-semibold mb-4">Control Status</h2>
+        <Card>
+          <CardContent className="divide-y">
+            {controlStatuses.map((cs) => {
+              const control = controlMap.get(cs.control_id);
+              const dot = ragDot[cs.rag] || ragDot.red;
+              const badge = ragBadge[cs.rag] || ragBadge.red;
+              return (
+                <div
+                  key={cs.control_id}
+                  className="flex items-center gap-4 py-3 first:pt-0 last:pb-0"
                 >
-                  {cs.rag.toUpperCase()}
-                </span>
-                <span className="text-sm text-gray-500 w-12 text-right">
-                  {(Number(cs.score) * 100).toFixed(0)}%
-                </span>
-              </div>
-            );
-          })}
-        </div>
+                  <div className={`h-3 w-3 shrink-0 rounded-full ${dot}`} />
+                  <span className="text-xs font-mono text-muted-foreground w-16">
+                    {control?.control_code}
+                  </span>
+                  <span className="flex-1 text-sm">
+                    {control?.title}
+                  </span>
+                  <Badge variant="outline" className={badge}>
+                    {cs.rag.toUpperCase()}
+                  </Badge>
+                  <span className="text-sm text-muted-foreground w-12 text-right tabular-nums">
+                    {(Number(cs.score) * 100).toFixed(0)}%
+                  </span>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Remediation actions */}
       {remediationActions.length > 0 && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <h2 className="text-lg font-semibold mb-4">
             Remediation Actions ({remediationActions.length})
           </h2>
           <div className="space-y-3">
             {remediationActions.map((action) => {
               const control = controlMap.get(action.control_id);
+              const pb = priorityBadge[action.priority] || priorityBadge.medium;
               return (
-                <div
-                  key={action.id}
-                  className="rounded-lg border border-gray-200 bg-white p-4"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span
-                          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
-                            priorityColors[
-                              action.priority as keyof typeof priorityColors
-                            ] || ""
-                          }`}
-                        >
-                          {action.priority}
-                        </span>
-                        <span className="text-xs text-gray-400 font-mono">
-                          {control?.control_code}
-                        </span>
+                <Card key={action.id}>
+                  <CardContent>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant={pb.variant} className={pb.className}>
+                            {action.priority}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground font-mono">
+                            {control?.control_code}
+                          </span>
+                        </div>
+                        <h3 className="font-medium">{action.title}</h3>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {action.description}
+                        </p>
                       </div>
-                      <h3 className="font-medium text-gray-900">
-                        {action.title}
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-600">
-                        {action.description}
-                      </p>
+                      <Badge
+                        variant="outline"
+                        className={
+                          action.status === "done"
+                            ? "bg-green-100 text-green-700 border-green-200"
+                            : action.status === "in_progress"
+                              ? "bg-blue-100 text-blue-700 border-blue-200"
+                              : ""
+                        }
+                      >
+                        {action.status.replace("_", " ")}
+                      </Badge>
                     </div>
-                    <span
-                      className={`shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        action.status === "done"
-                          ? "bg-green-100 text-green-700"
-                          : action.status === "in_progress"
-                            ? "bg-blue-100 text-blue-700"
-                            : "bg-gray-100 text-gray-700"
-                      }`}
-                    >
-                      {action.status.replace("_", " ")}
-                    </span>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>

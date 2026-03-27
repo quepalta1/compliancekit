@@ -139,7 +139,7 @@ export async function completeAssessment(
   // Sort for priority ranking: red first (by weight desc), then amber, then green
   const ragOrder = { red: 0, amber: 1, green: 2 } as const;
   const sorted = [...controlStatuses].sort((a, b) => {
-    const ragDiff = ragOrder[a.rag] - ragOrder[b.rag];
+    const ragDiff = ragOrder[a.rag as keyof typeof ragOrder] - ragOrder[b.rag as keyof typeof ragOrder];
     if (ragDiff !== 0) return ragDiff;
     return b.weight - a.weight;
   });
@@ -196,7 +196,7 @@ export async function completeAssessment(
 
   // Calculate overall score
   const scorePct = calculateOverallScore(
-    controlStatuses.map((cs) => ({ answer: cs.answer, weight: cs.weight })),
+    controlStatuses.map((cs: any) => ({ answer: cs.answer, weight: cs.weight })),
   );
 
   const { error: updateError } = await supabase
