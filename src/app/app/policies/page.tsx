@@ -14,7 +14,7 @@ import {
 import { AutoRefresh } from "@/components/policies/auto-refresh";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/lib/button-variants";
 
 const statusConfig = {
   queued: {

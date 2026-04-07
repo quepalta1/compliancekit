@@ -5,7 +5,7 @@ import Link from "next/link";
 import { FileCheck, Plus, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/lib/button-variants";
 
 function getEvidenceStatus(expiresAt: string | null): {
   label: string;

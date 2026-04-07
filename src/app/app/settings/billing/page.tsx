@@ -218,14 +218,14 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
             return (
               <Card
                 key={plan.id}
-                className={
+                className={`flex flex-col ${
                   highlights.recommended
-                    ? "border-primary ring-1 ring-primary relative"
+                    ? "border-primary ring-1 ring-primary relative overflow-visible"
                     : ""
-                }
+                }`}
               >
                 {highlights.recommended && (
-                  <Badge className="absolute -top-2.5 left-4">
+                  <Badge className="absolute -top-2.5 left-1/2 -translate-x-1/2 z-10 shadow-sm">
                     Most Popular
                   </Badge>
                 )}
@@ -235,8 +235,8 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                     {highlights.price}
                   </p>
                 </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 mb-5">
+                <CardContent className="flex flex-1 flex-col">
+                  <ul className="flex-1 space-y-2 mb-5">
                     {highlights.features.map((feature) => (
                       <li
                         key={feature}

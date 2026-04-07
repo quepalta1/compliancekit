@@ -13,7 +13,7 @@ import {
 import { PrintButton } from "@/components/print-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/lib/button-variants";
 import { Separator } from "@/components/ui/separator";
 
 interface Props {
