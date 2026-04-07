@@ -9,6 +9,8 @@ values
       "assessments_per_month": 1,
       "policy_generations_per_month": 1,
       "evidence_items_limit": 25,
+      "buyer_requirements_limit": 5,
+      "connected_suppliers_limit": 3,
       "team_members": 1,
       "pdf_export": false
     }'::jsonb
@@ -22,6 +24,8 @@ values
       "assessments_per_month": 5,
       "policy_generations_per_month": 10,
       "evidence_items_limit": 100,
+      "buyer_requirements_limit": 25,
+      "connected_suppliers_limit": 15,
       "team_members": 1,
       "pdf_export": true
     }'::jsonb
@@ -35,6 +39,8 @@ values
       "assessments_per_month": 25,
       "policy_generations_per_month": 50,
       "evidence_items_limit": 500,
+      "buyer_requirements_limit": 100,
+      "connected_suppliers_limit": 75,
       "team_members": 5,
       "pdf_export": true
     }'::jsonb
@@ -48,6 +54,8 @@ values
       "assessments_per_month": 100,
       "policy_generations_per_month": 200,
       "evidence_items_limit": 2000,
+      "buyer_requirements_limit": 500,
+      "connected_suppliers_limit": 250,
       "team_members": 15,
       "pdf_export": true
     }'::jsonb

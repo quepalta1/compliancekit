@@ -12,6 +12,10 @@ import type {
   RemediationStatus,
   MemberRole,
   PolicyStatus,
+  SupplierRelationshipStatus,
+  RequirementCategory,
+  RequirementType,
+  SupplierComplianceStatus,
 } from './constants';
 
 // ── Auth / profiles ─────────────────────────────────────────────────
@@ -227,4 +231,39 @@ export interface PolicyDocument {
   error_message: string | null;
   created_at: string;
   completed_at: string | null;
+}
+
+export interface SupplierRelationship {
+  id: string;
+  customer_organization_id: string;
+  supplier_organization_id: string;
+  status: SupplierRelationshipStatus;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface BuyerRequirement {
+  id: string;
+  organization_id: string;
+  title: string;
+  description: string;
+  category: RequirementCategory;
+  requirement_type: RequirementType;
+  framework_ref: string | null;
+  evidence_hint: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface SupplierRequirementResponse {
+  id: string;
+  relationship_id: string;
+  requirement_id: string;
+  compliance_status: SupplierComplianceStatus;
+  response_text: string;
+  evidence_summary: string | null;
+  submitted_by: string | null;
+  submitted_at: string;
+  updated_at: string;
 }

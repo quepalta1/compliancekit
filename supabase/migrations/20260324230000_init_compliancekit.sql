@@ -286,6 +286,50 @@ create table if not exists public.policy_documents (
   unique (organization_id, template_id, input_hash)
 );
 
+create table if not exists public.supplier_relationships (
+  id uuid primary key default gen_random_uuid(),
+  customer_organization_id uuid not null references public.organizations(id) on delete cascade,
+  supplier_organization_id uuid not null references public.organizations(id) on delete cascade,
+  status text not null default 'active' check (status in ('active')),
+  created_by uuid references auth.users(id) on delete set null,
+  created_at timestamptz not null default now(),
+  unique (customer_organization_id, supplier_organization_id),
+  check (customer_organization_id <> supplier_organization_id)
+);
+
+create table if not exists public.buyer_requirements (
+  id uuid primary key default gen_random_uuid(),
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  title text not null,
+  description text not null,
+  category text not null check (
+    category in ('security', 'animal_welfare', 'sustainability', 'labor', 'privacy', 'operations', 'other')
+  ),
+  requirement_type text not null default 'buyer_policy' check (
+    requirement_type in ('framework', 'buyer_policy')
+  ),
+  framework_ref text,
+  evidence_hint text,
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.supplier_requirement_responses (
+  id uuid primary key default gen_random_uuid(),
+  relationship_id uuid not null references public.supplier_relationships(id) on delete cascade,
+  requirement_id uuid not null references public.buyer_requirements(id) on delete cascade,
+  compliance_status text not null check (
+    compliance_status in ('compliant', 'partial', 'not_compliant', 'not_applicable')
+  ),
+  response_text text not null,
+  evidence_summary text,
+  submitted_by uuid references auth.users(id) on delete set null,
+  submitted_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (relationship_id, requirement_id)
+);
+
 create index if not exists idx_organization_members_user_id
   on public.organization_members (user_id);
 
@@ -340,8 +384,28 @@ create index if not exists idx_policy_documents_template_id
 create index if not exists idx_policy_documents_status
   on public.policy_documents (status);
 
+create index if not exists idx_supplier_relationships_customer_org_id
+  on public.supplier_relationships (customer_organization_id);
+
+create index if not exists idx_supplier_relationships_supplier_org_id
+  on public.supplier_relationships (supplier_organization_id);
+
+create index if not exists idx_buyer_requirements_org_id
+  on public.buyer_requirements (organization_id);
+
+create index if not exists idx_supplier_requirement_responses_relationship_id
+  on public.supplier_requirement_responses (relationship_id);
+
+create index if not exists idx_supplier_requirement_responses_requirement_id
+  on public.supplier_requirement_responses (requirement_id);
+
 create trigger trg_subscriptions_updated_at
 before update on public.subscriptions
+for each row
+execute function public.set_updated_at();
+
+create trigger trg_supplier_requirement_responses_updated_at
+before update on public.supplier_requirement_responses
 for each row
 execute function public.set_updated_at();
 
@@ -376,6 +440,9 @@ alter table public.evidence_files enable row level security;
 alter table public.email_notifications enable row level security;
 alter table public.policy_templates enable row level security;
 alter table public.policy_documents enable row level security;
+alter table public.supplier_relationships enable row level security;
+alter table public.buyer_requirements enable row level security;
+alter table public.supplier_requirement_responses enable row level security;
 
 create policy "profiles_select_self"
 on public.profiles
@@ -620,6 +687,124 @@ for all
 to authenticated
 using (public.is_org_member(organization_id))
 with check (public.is_org_member(organization_id));
+
+create or replace function public.is_supplier_relationship_participant(target_relationship_id uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.supplier_relationships sr
+    where sr.id = target_relationship_id
+      and (
+        public.is_org_member(sr.customer_organization_id)
+        or public.is_org_member(sr.supplier_organization_id)
+      )
+  );
+$$;
+
+create policy "supplier_relationships_select_participant"
+on public.supplier_relationships
+for select
+to authenticated
+using (
+  public.is_org_member(customer_organization_id)
+  or public.is_org_member(supplier_organization_id)
+);
+
+create policy "supplier_relationships_insert_customer_admin"
+on public.supplier_relationships
+for insert
+to authenticated
+with check (public.is_org_admin(customer_organization_id));
+
+create policy "supplier_relationships_update_customer_admin"
+on public.supplier_relationships
+for update
+to authenticated
+using (public.is_org_admin(customer_organization_id))
+with check (public.is_org_admin(customer_organization_id));
+
+create policy "buyer_requirements_select_owner_or_supplier"
+on public.buyer_requirements
+for select
+to authenticated
+using (
+  public.is_org_member(organization_id)
+  or exists (
+    select 1
+    from public.supplier_relationships sr
+    where sr.customer_organization_id = buyer_requirements.organization_id
+      and sr.status = 'active'
+      and public.is_org_member(sr.supplier_organization_id)
+  )
+);
+
+create policy "buyer_requirements_insert_admin"
+on public.buyer_requirements
+for insert
+to authenticated
+with check (public.is_org_admin(organization_id));
+
+create policy "buyer_requirements_update_admin"
+on public.buyer_requirements
+for update
+to authenticated
+using (public.is_org_admin(organization_id))
+with check (public.is_org_admin(organization_id));
+
+create policy "buyer_requirements_delete_admin"
+on public.buyer_requirements
+for delete
+to authenticated
+using (public.is_org_admin(organization_id));
+
+create policy "supplier_requirement_responses_select_participant"
+on public.supplier_requirement_responses
+for select
+to authenticated
+using (public.is_supplier_relationship_participant(relationship_id));
+
+create policy "supplier_requirement_responses_insert_supplier_member"
+on public.supplier_requirement_responses
+for insert
+to authenticated
+with check (
+  exists (
+    select 1
+    from public.supplier_relationships sr
+    join public.buyer_requirements br on br.id = supplier_requirement_responses.requirement_id
+    where sr.id = supplier_requirement_responses.relationship_id
+      and br.organization_id = sr.customer_organization_id
+      and public.is_org_member(sr.supplier_organization_id)
+  )
+);
+
+create policy "supplier_requirement_responses_update_supplier_member"
+on public.supplier_requirement_responses
+for update
+to authenticated
+using (
+  exists (
+    select 1
+    from public.supplier_relationships sr
+    where sr.id = supplier_requirement_responses.relationship_id
+      and public.is_org_member(sr.supplier_organization_id)
+  )
+)
+with check (
+  exists (
+    select 1
+    from public.supplier_relationships sr
+    join public.buyer_requirements br on br.id = supplier_requirement_responses.requirement_id
+    where sr.id = supplier_requirement_responses.relationship_id
+      and br.organization_id = sr.customer_organization_id
+      and public.is_org_member(sr.supplier_organization_id)
+  )
+);
 
 create policy "storage_evidence_read_member"
 on storage.objects

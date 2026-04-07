@@ -15,6 +15,23 @@ export const MEMBER_ROLES = ['owner', 'admin', 'member'] as const;
 export const POLICY_STATUSES = ['queued', 'generating', 'completed', 'failed'] as const;
 export const PLAN_CODES = ['free', 'starter', 'pro', 'team'] as const;
 export const REMINDER_DAYS = [90, 60, 30] as const;
+export const SUPPLIER_RELATIONSHIP_STATUSES = ['active'] as const;
+export const REQUIREMENT_CATEGORIES = [
+  'security',
+  'animal_welfare',
+  'sustainability',
+  'labor',
+  'privacy',
+  'operations',
+  'other',
+] as const;
+export const REQUIREMENT_TYPES = ['framework', 'buyer_policy'] as const;
+export const SUPPLIER_COMPLIANCE_STATUSES = [
+  'compliant',
+  'partial',
+  'not_compliant',
+  'not_applicable',
+] as const;
 
 // ── Type aliases derived from the const arrays ──────────────────────
 
@@ -29,6 +46,10 @@ export type MemberRole = (typeof MEMBER_ROLES)[number];
 export type PolicyStatus = (typeof POLICY_STATUSES)[number];
 export type PlanCode = (typeof PLAN_CODES)[number];
 export type ReminderDay = (typeof REMINDER_DAYS)[number];
+export type SupplierRelationshipStatus = (typeof SUPPLIER_RELATIONSHIP_STATUSES)[number];
+export type RequirementCategory = (typeof REQUIREMENT_CATEGORIES)[number];
+export type RequirementType = (typeof REQUIREMENT_TYPES)[number];
+export type SupplierComplianceStatus = (typeof SUPPLIER_COMPLIANCE_STATUSES)[number];
 
 // ── Scoring ─────────────────────────────────────────────────────────
 
