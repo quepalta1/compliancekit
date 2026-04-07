@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 export const metadata: Metadata = {
   title: "Pricing – ComplianceKit",
   description:
-    "Simple, transparent pricing for NIS2 and ISO 27001 compliance. Start free.",
+    "Simple, transparent pricing for supplier compliance and framework readiness. Start free.",
 };
 
 const plans = [
@@ -28,6 +28,8 @@ const plans = [
       { text: "1 policy generation / month", included: true },
       { text: "25 evidence items", included: true },
       { text: "1 team member", included: true },
+      { text: "5 buyer requirements", included: true },
+      { text: "3 connected suppliers", included: true },
       { text: "PDF export", included: false },
       { text: "Priority support", included: false },
     ],
@@ -44,6 +46,8 @@ const plans = [
       { text: "10 policy generations / month", included: true },
       { text: "100 evidence items", included: true },
       { text: "1 team member", included: true },
+      { text: "25 buyer requirements", included: true },
+      { text: "15 connected suppliers", included: true },
       { text: "PDF export", included: true },
       { text: "Priority support", included: false },
     ],
@@ -60,6 +64,8 @@ const plans = [
       { text: "50 policy generations / month", included: true },
       { text: "500 evidence items", included: true },
       { text: "5 team members", included: true },
+      { text: "100 buyer requirements", included: true },
+      { text: "75 connected suppliers", included: true },
       { text: "PDF export", included: true },
       { text: "Priority support", included: true },
     ],
@@ -76,6 +82,8 @@ const plans = [
       { text: "200 policy generations / month", included: true },
       { text: "2,000 evidence items", included: true },
       { text: "15 team members", included: true },
+      { text: "500 buyer requirements", included: true },
+      { text: "250 connected suppliers", included: true },
       { text: "PDF export", included: true },
       { text: "Priority support", included: true },
     ],

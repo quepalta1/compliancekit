@@ -58,7 +58,7 @@ export default function MarketingLayout({
                 </span>
               </Link>
               <p className="mt-3 text-sm text-muted-foreground">
-                NIS2 and ISO 27001 compliance for European SMEs.
+                Supplier assurance and framework compliance for modern enterprises.
               </p>
             </div>
             <div>

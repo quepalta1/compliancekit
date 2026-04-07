@@ -1,6 +1,14 @@
 # ComplianceKit
 
-NIS2 & ISO 27001 readiness platform for European SMEs.
+Supplier assurance platform — manage buyer-defined supplier requirements and regulatory framework readiness in one place.
+
+## What it does
+
+**For buyers:** Define compliance requirements for your suppliers (security, sustainability, labor standards, privacy, and more), connect supplier organizations, and monitor their compliance status across your network.
+
+**For suppliers:** See requirements from buyer organizations you supply to, submit compliance responses with evidence summaries, and track your status across all buyer relationships.
+
+**For compliance teams:** Run NIS2 and ISO 27001 readiness assessments, generate AI-drafted policies, manage evidence, and track remediation actions.
 
 ## Tech Stack
 
@@ -63,12 +71,12 @@ npx supabase db push
 # Or run against hosted:
 npx supabase db push --db-url "postgresql://postgres:PASSWORD@HOST:5432/postgres"
 
-# Seed data (plans, NIS2 controls, policy templates)
+# Seed data
 npx supabase db seed
 ```
 
-The migration creates all tables, RLS policies, storage buckets, and triggers. The seed script populates:
-- 4 subscription plans (Free, Starter, Pro, Team)
+The migration creates all tables (including supplier network tables), RLS policies, storage buckets, and triggers. The seed script populates:
+- 4 subscription plans (Free, Starter, Pro, Team) with supplier network limits
 - 21 NIS2 Article 21(2) controls
 - 4 policy templates
 
@@ -79,6 +87,25 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+## Domain Model
+
+### Framework Compliance
+- **Control Catalog** — NIS2 Article 21(2) controls with ISO 27001 cross-references
+- **Assessments** — Answer-based scoring against framework controls (RAG status)
+- **Evidence Items** — Uploaded documents linked to controls, with expiry tracking
+- **Policy Documents** — AI-generated policies from templates
+- **Remediation Actions** — Prioritized tasks to close compliance gaps
+
+### Supplier Network
+- **Supplier Relationships** — Links a buyer (customer) org to a supplier org
+- **Buyer Requirements** — Custom requirements defined by buyer orgs (categorized by security, sustainability, labor, privacy, etc.)
+- **Supplier Responses** — Compliance status, attestation text, and evidence summary per requirement
+
+### Shared
+- **Organizations** — Multi-tenant workspaces (can act as both buyer and supplier)
+- **Members** — Users with roles (owner, admin, member) within organizations
+- **Subscriptions** — Stripe-backed billing with plan-based feature limits
 
 ## Stripe Setup
 
@@ -120,12 +147,22 @@ A cron job runs daily at 08:00 UTC to send email reminders for evidence items ex
 ```
 src/
   app/
-    (marketing)/     # Public pages
+    (marketing)/     # Public pages (landing, pricing)
     (auth)/          # Login, signup, reset password
-    (app)/           # Authenticated app pages
+    app/             # Authenticated app pages
+      dashboard/     # Combined framework + network overview
+      assessment/    # NIS2 framework assessment
+      evidence/      # Evidence vault
+      policies/      # AI policy generation
+      reports/       # Compliance reports
+      requirements/  # Buyer requirements management
+      suppliers/     # Connected suppliers (buyer view)
+      customers/     # Buyer relationships (supplier view)
     api/             # Route handlers (Stripe webhook, cron, uploads)
   components/        # React components
+    network/         # Supplier network form components
   lib/               # Shared utilities, clients, constants
+    network/         # Supplier compliance summary logic
   server/
     actions/         # Server actions
     queries/         # Server-side data fetching

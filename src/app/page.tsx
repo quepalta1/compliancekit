@@ -1,6 +1,8 @@
 import Link from "next/link";
 import {
   Shield,
+  ClipboardList,
+  Building2,
   ClipboardCheck,
   FileText,
   FolderCheck,
@@ -19,10 +21,22 @@ import { Badge } from "@/components/ui/badge";
 
 const features = [
   {
-    icon: ClipboardCheck,
-    title: "NIS2 Assessment",
+    icon: ClipboardList,
+    title: "Supplier Requirements",
     description:
-      "Evaluate your compliance posture across all Article 21(2) controls with guided questionnaires and automatic scoring.",
+      "Define buyer-specific compliance requirements — from security and privacy to sustainability and labor standards — and track supplier responses.",
+  },
+  {
+    icon: Building2,
+    title: "Network Visibility",
+    description:
+      "Connect suppliers to your workspace, monitor their compliance status in real time, and identify gaps across your supply chain.",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "Framework Readiness",
+    description:
+      "Assess compliance against NIS2, ISO 27001, and other regulatory frameworks with guided questionnaires and automatic scoring.",
   },
   {
     icon: FileText,
@@ -47,21 +61,21 @@ const features = [
 const steps = [
   {
     number: "1",
-    title: "Assess",
+    title: "Define",
     description:
-      "Run a comprehensive NIS2 readiness assessment. Understand your current compliance posture in under 30 minutes.",
+      "Set up your workspace, define buyer-specific supplier requirements, and connect your suppliers — or run a framework readiness assessment.",
   },
   {
     number: "2",
-    title: "Plan",
+    title: "Connect",
     description:
-      "Get a prioritized action plan with AI-generated policies and clear remediation steps tailored to your gaps.",
+      "Link supplier organizations to your network. Suppliers see your requirements and submit compliance responses with supporting evidence.",
   },
   {
     number: "3",
-    title: "Comply",
+    title: "Verify",
     description:
-      "Track evidence, assign tasks, and demonstrate compliance readiness to auditors and regulators.",
+      "Monitor supplier compliance in real time, track progress across your network, and demonstrate assurance to stakeholders and auditors.",
   },
 ];
 
@@ -122,13 +136,11 @@ export default function HomePage() {
             Trusted by 100+ European companies
           </Badge>
           <h1 className="text-4xl font-bold tracking-tight text-[#0F172A] sm:text-5xl lg:text-6xl">
-            NIS2 Compliance,{" "}
+            Supplier Compliance,{" "}
             <span className="text-[#0369A1]">Simplified.</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
-            The all-in-one platform that helps European SMEs achieve and maintain
-            NIS2 and ISO 27001 compliance — with guided assessments, AI-powered
-            policy generation, and centralized evidence management.
+            The supplier assurance platform that helps companies define, track, and verify compliance requirements across their supplier network — with built-in NIS2 and ISO 27001 readiness.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/signup">
@@ -136,7 +148,7 @@ export default function HomePage() {
                 size="lg"
                 className="h-12 gap-2 bg-[#0369A1] px-8 text-base text-white hover:bg-[#0369A1]/90"
               >
-                Start Free Assessment
+                Get Started Free
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -174,15 +186,14 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold tracking-tight text-[#0F172A]">
-              Everything you need for NIS2 compliance
+              Everything you need for supplier compliance
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              A complete toolkit designed specifically for European SMEs
-              navigating the NIS2 directive.
+              Manage buyer-defined requirements and regulatory frameworks in one unified platform.
             </p>
           </div>
 
-          <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => (
               <Card
                 key={feature.title}
@@ -215,7 +226,7 @@ export default function HomePage() {
               How it works
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Get from zero to compliant in three straightforward steps.
+              From requirements to verified compliance in three steps.
             </p>
           </div>
 
@@ -241,11 +252,10 @@ export default function HomePage() {
       <section className="px-6 py-20 sm:py-24">
         <div className="mx-auto max-w-4xl rounded-2xl bg-[#0F172A] px-8 py-16 text-center shadow-xl sm:px-16">
           <h2 className="text-3xl font-bold tracking-tight text-white">
-            Ready to get compliant?
+            Ready to assure your supply chain?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-slate-300">
-            Join hundreds of European organizations using ComplianceKit to
-            streamline their NIS2 and ISO 27001 compliance journey.
+            Join hundreds of organizations using ComplianceKit to manage supplier compliance, framework readiness, and evidence — all in one place.
           </p>
           <div className="mt-8">
             <Link href="/signup">
@@ -253,7 +263,7 @@ export default function HomePage() {
                 size="lg"
                 className="h-12 gap-2 bg-[#0369A1] px-8 text-base text-white hover:bg-[#0369A1]/90"
               >
-                Start Free Assessment
+                Get Started Free
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -273,7 +283,7 @@ export default function HomePage() {
                 </span>
               </Link>
               <p className="mt-3 text-sm text-muted-foreground">
-                NIS2 and ISO 27001 compliance for European SMEs.
+                Supplier assurance and framework compliance for modern enterprises.
               </p>
             </div>
             <div>
