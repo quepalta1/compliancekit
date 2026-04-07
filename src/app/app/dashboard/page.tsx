@@ -1,4 +1,5 @@
 import { getCurrentOrganization } from "@/server/queries/organization";
+import { getBuyerNetwork, getSupplierNetwork, getBuyerRequirements } from "@/server/queries/network";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -12,6 +13,9 @@ import {
   CheckCircle2,
   XOctagon,
   Shield,
+  Building2,
+  Handshake,
+  ClipboardList,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -63,6 +67,25 @@ export default async function DashboardPage() {
     }
   }
 
+  const [buyerNetwork, supplierNetwork, buyerRequirements] = await Promise.all([
+    getBuyerNetwork(organization.id),
+    getSupplierNetwork(organization.id),
+    getBuyerRequirements(organization.id),
+  ]);
+
+  const totalSuppliers = buyerNetwork.length;
+  const totalCustomers = supplierNetwork.length;
+  const totalBuyerRequirements = buyerRequirements.length;
+  const avgSupplierCompletion = totalSuppliers > 0
+    ? Math.round(buyerNetwork.reduce((sum, s) => sum + s.summary.completionPct, 0) / totalSuppliers)
+    : 0;
+  const totalIncomingRequirements = supplierNetwork.reduce(
+    (sum, c) => sum + c.requirements.length, 0
+  );
+  const totalResponded = supplierNetwork.reduce(
+    (sum, c) => sum + c.requirements.filter(r => r.response).length, 0
+  );
+
   const redCount = controlStatuses.filter((s: any) => s.rag === "red").length;
   const amberCount = controlStatuses.filter(
     (s: any) => s.rag === "amber",
@@ -97,16 +120,23 @@ export default async function DashboardPage() {
                 Get started with ComplianceKit
               </h2>
               <p className="max-w-lg text-sm text-muted-foreground">
-                Complete your onboarding to determine your NIS2 applicability
-                and begin your compliance assessment.
+                Complete your organization profile to assess framework readiness, or start defining supplier requirements right away.
               </p>
-              <Link
-                href="/app/onboarding"
-                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
-              >
-                Start Onboarding
-                <ArrowRight className="h-4 w-4" />
-              </Link>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <Link
+                  href="/app/onboarding"
+                  className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80"
+                >
+                  Start Onboarding
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href="/app/requirements"
+                  className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                >
+                  Define Supplier Requirements
+                </Link>
+              </div>
             </div>
             <Shield className="hidden h-20 w-20 text-primary/10 md:block" />
           </CardContent>
@@ -217,11 +247,11 @@ export default async function DashboardPage() {
             </div>
           )}
 
-          {/* NIS2 Classification */}
+          {/* Framework Readiness */}
           <Card>
             <CardHeader>
               <CardTitle className="text-sm font-medium text-muted-foreground">
-                NIS2 Classification
+                Framework Readiness
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -307,6 +337,61 @@ export default async function DashboardPage() {
           </div>
         </>
       )}
+
+      {/* Supplier Network */}
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold text-foreground">Supplier Network</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">As Buyer</CardTitle>
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalSuppliers}</div>
+              <p className="text-xs text-muted-foreground">
+                connected suppliers{totalSuppliers > 0 ? ` · ${avgSupplierCompletion}% avg. completion` : ''}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {totalBuyerRequirements} requirements defined
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">As Supplier</CardTitle>
+              <Handshake className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalCustomers}</div>
+              <p className="text-xs text-muted-foreground">
+                buyer relationships
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {totalResponded} of {totalIncomingRequirements} requirements responded
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Quick Links</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              <Link href="/app/requirements" className="flex items-center gap-2 text-sm text-primary hover:underline">
+                <ClipboardList className="h-3.5 w-3.5" /> Manage Requirements
+              </Link>
+              <Link href="/app/suppliers" className="flex items-center gap-2 text-sm text-primary hover:underline">
+                <Building2 className="h-3.5 w-3.5" /> View Suppliers
+              </Link>
+              <Link href="/app/customers" className="flex items-center gap-2 text-sm text-primary hover:underline">
+                <Handshake className="h-3.5 w-3.5" /> View Customers
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

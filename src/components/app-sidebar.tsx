@@ -10,6 +10,9 @@ import {
   CreditCard,
   Users,
   Shield,
+  ClipboardList,
+  Building2,
+  Handshake,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -25,6 +28,12 @@ const mainNav = [
 const settingsNav = [
   { label: "Billing", href: "/app/settings/billing", icon: CreditCard },
   { label: "Team", href: "/app/settings/team", icon: Users },
+];
+
+const networkNav = [
+  { label: "Requirements", href: "/app/requirements", icon: ClipboardList },
+  { label: "Suppliers", href: "/app/suppliers", icon: Building2 },
+  { label: "Customers", href: "/app/customers", icon: Handshake },
 ];
 
 interface AppSidebarProps {
@@ -76,6 +85,35 @@ export function AppSidebar({ currentPath, userName, userEmail }: AppSidebarProps
             );
           })}
         </ul>
+
+        {/* Supplier Network section */}
+        <div className="mt-6">
+          <Separator className="mb-4 bg-sidebar-border" />
+          <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-widest text-sidebar-foreground/40">
+            Supplier Network
+          </p>
+          <ul className="space-y-0.5">
+            {networkNav.map((item) => {
+              const isActive = currentPath.startsWith(item.href);
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-200",
+                      isActive
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground",
+                    )}
+                  >
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
 
         {/* Settings section */}
         <div className="mt-6">
